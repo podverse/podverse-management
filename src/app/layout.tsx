@@ -2,6 +2,8 @@ import '../styles/index.scss';
 import Providers from '../providers/Providers';
 import { getLocale } from 'next-intl/server';
 import { config } from '../config';
+import FavIcons from '../components/Head/FavIcons';
+import Manifest from '../components/Head/Manifest';
 
 export const metadata = {
   title: config.public.brand.name || 'Podverse Management',
@@ -17,6 +19,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <FavIcons />
+        <Manifest />
       </head>
       <body>
         <Providers locale={locale} messages={messages}>
