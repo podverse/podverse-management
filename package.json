@@ -1,11 +1,11 @@
 {
-  "name": "podverse-management",
+  "name": "podverse-management-web",
   "version": "5.1.26",
   "description": "Administrative management interface for Podverse",
   "private": true,
   "main": "./src/index.js",
-  "repository": "https://github.com/podverse/podverse-management.git",
-  "homepage": "https://github.com/podverse/podverse-management#readme",
+  "repository": "https://github.com/podverse/podverse-management-web.git",
+  "homepage": "https://github.com/podverse/podverse-management-web#readme",
   "author": "Mitch Downey <mitch@podverse.fm>",
   "contributors": [
     "Mitch Downey"

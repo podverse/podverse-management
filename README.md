@@ -1,4 +1,4 @@
-# podverse-management
+# podverse-management-web
 
 Administrative management interface for Podverse.
 
@@ -54,12 +54,12 @@ npm start
 
 Build the Docker image:
 ```bash
-docker build -t podverse-management .
+docker build -t podverse-management-web .
 ```
 
 Build with alpha configuration:
 ```bash
-docker build -f Dockerfile.build.alpha -t podverse-management-deploy .
+docker build -f Dockerfile.build.alpha -t podverse-management-web-deploy .
 ```
 
 ## Environment Variables

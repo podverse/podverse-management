@@ -1,4 +1,4 @@
-name: Publish Alpha podverse-management Docker image
+name: Publish Alpha podverse-management-web Docker image
 
 on:
   push:
@@ -32,12 +32,12 @@ jobs:
         run: |
           BASE_VERSION=$(node -p "require('./package.json').version")
           BASE_VERSION=$(echo "$BASE_VERSION" | sed 's/-.*//')
-          IMAGE_NAME=ghcr.io/${{ github.repository }}/podverse-management
+          IMAGE_NAME=ghcr.io/${{ github.repository }}/podverse-management-web
 
           # Use a PAT with read:packages scope
           TOKEN="${{ secrets.GHCR_REGISTRY_TOKEN }}"
           TAGS_JSON=$(curl -s -H "Authorization: Bearer $TOKEN" \
-            "https://ghcr.io/v2/${{ github.repository }}/podverse-management/tags/list")
+            "https://ghcr.io/v2/${{ github.repository }}/podverse-management-web/tags/list")
           echo "Raw tags JSON: $TAGS_JSON"
           TAGS=$(echo "$TAGS_JSON" | jq -r '.tags[]' | grep "alpha" || true)
           echo "Filtered alpha tags: $TAGS"
@@ -69,11 +69,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build . -t ghcr.io/${{ github.repository }}/podverse-management:${{ steps.version.outputs.NEXT_VERSION }}
+          docker build . -t ghcr.io/${{ github.repository }}/podverse-management-web:${{ steps.version.outputs.NEXT_VERSION }}
 
       - name: Build second Docker image from Dockerfile.build.alpha with Podverse env vars
         run: |
-          docker build . -f ./Dockerfile.build.alpha -t ghcr.io/${{ github.repository }}/podverse-management-deploy:${{ steps.version.outputs.NEXT_VERSION }}
+          docker build . -f ./Dockerfile.build.alpha -t ghcr.io/${{ github.repository }}/podverse-management-web-deploy:${{ steps.version.outputs.NEXT_VERSION }}
 
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -84,8 +84,8 @@ jobs:
 
       - name: Push Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/podverse-management:${{ steps.version.outputs.NEXT_VERSION }}
+          docker push ghcr.io/${{ github.repository }}/podverse-management-web:${{ steps.version.outputs.NEXT_VERSION }}
 
       - name: Push second Docker image
         run: |
-          docker push ghcr.io/${{ github.repository }}/podverse-management-deploy:${{ steps.version.outputs.NEXT_VERSION }}
+          docker push ghcr.io/${{ github.repository }}/podverse-management-web-deploy:${{ steps.version.outputs.NEXT_VERSION }}
