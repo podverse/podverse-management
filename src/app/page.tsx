@@ -1,83 +1,132 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { getAdminAccountById, type AdminAccount } from '../lib/requests/adminAccount';
-
-function getCookie(name: string): string | undefined {
-  if (typeof document === 'undefined') return undefined;
-  const value = `; ${document.cookie}`;
-  const parts = value.split(`; ${name}=`);
-  if (parts.length === 2) {
-    return parts.pop()?.split(';').shift();
-  }
-  return undefined;
-}
+import { useState, useEffect, FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { login, getCurrentUser } from '../lib/requests/auth';
+import { Button } from '../components/ui/Button/Button';
+import { FormGroup, FormLabel, FormInput } from '../components/ui/Form';
+import { Card } from '../components/ui/Card/Card';
+import { CenterContainer } from '../components/ui/CenterContainer/CenterContainer';
+import { Alert } from '../components/ui/Alert/Alert';
+import { LoadingText } from '../components/ui/LoadingText/LoadingText';
+import styles from './page.module.scss';
 
 export default function HomePage() {
-  const [adminAccount, setAdminAccount] = useState<AdminAccount | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchAdminAccount = async () => {
+    const checkAuth = async () => {
       try {
-        setLoading(true);
-        setError(null);
-        const jwt = getCookie('pv_mgmt_auth');
-        const account = await getAdminAccountById(1, jwt);
-        setAdminAccount(account);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Failed to fetch admin account';
-        setError(errorMessage);
-        console.error('Error fetching admin account:', err);
+        const currentUser = await getCurrentUser();
+        if (currentUser) {
+          // User is already logged in, redirect to dashboard
+          router.push('/dashboard');
+          return;
+        }
+      } catch (error) {
+        // Not authenticated, stay on login page
+        console.error('Auth check error:', error);
       } finally {
-        setLoading(false);
+        setCheckingAuth(false);
       }
     };
 
-    fetchAdminAccount();
-  }, []);
+    checkAuth();
+  }, [router]);
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      await login({ email, password });
+      
+      // The cookie is set automatically by the API response via Set-Cookie header
+      // Redirect to dashboard on success
+      router.push('/dashboard');
+    } catch (err: unknown) {
+      // Handle axios errors - they may have response.data.message
+      let errorMessage = 'Invalid username or password';
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message) {
+          errorMessage = axiosError.response.data.message;
+        }
+      } else if (err instanceof Error) {
+        errorMessage = err.message;
+      }
+      setError(errorMessage);
+      console.error('Login error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Show loading state while checking authentication
+  if (checkingAuth) {
+    return (
+      <CenterContainer>
+        <LoadingText>Loading...</LoadingText>
+      </CenterContainer>
+    );
+  }
 
   return (
-    <div className="container">
-      <div className="page-header">
-        <h1 className="page-title">Podverse Management</h1>
-        <p className="page-subtitle">Administrative Dashboard</p>
-      </div>
-      <main>
-        <p>Welcome to the Podverse Management interface.</p>
-        <p>This is a functional administrative interface for managing Podverse.</p>
-        
-        <div style={{ marginTop: '2rem', padding: '1.5rem', border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
-          <h2 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.25rem', fontWeight: '600' }}>
-            Admin Account Demo
-          </h2>
-          
-          {loading && (
-            <p style={{ color: '#666', fontStyle: 'italic' }}>Loading admin account data...</p>
-          )}
-          
-          {error && (
-            <div style={{ padding: '0.75rem', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px', color: '#c33' }}>
-              <strong>Error:</strong> {error}
-            </div>
-          )}
-          
-          {!loading && !error && adminAccount && (
-            <div style={{ display: 'grid', gap: '0.75rem' }}>
-              <div>
-                <strong>ID:</strong> {adminAccount.id}
-              </div>
-              <div>
-                <strong>ID Text:</strong> {adminAccount.id_text}
-              </div>
-              <div>
-                <strong>Created At:</strong> {new Date(adminAccount.created_at).toLocaleString()}
-              </div>
-            </div>
-          )}
+    <CenterContainer>
+      <Card className={styles.loginCard}>
+        <div className={styles.loginHeader}>
+          <h1 className={styles.loginTitle}>
+            Podverse Management
+          </h1>
+          <p className={styles.loginSubtitle}>
+            Please sign in to continue
+          </p>
         </div>
-      </main>
-    </div>
+
+        <form onSubmit={handleSubmit}>
+          {error && (
+            <Alert variant="error">{error}</Alert>
+          )}
+
+          <FormGroup>
+            <FormLabel htmlFor="email">
+              Username / Email
+            </FormLabel>
+            <FormInput
+              id="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <FormLabel htmlFor="password">
+              Password
+            </FormLabel>
+            <FormInput
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </FormGroup>
+
+          <Button type="submit" disabled={loading}>
+            {loading ? 'Signing in...' : 'Sign In'}
+          </Button>
+        </form>
+      </Card>
+    </CenterContainer>
   );
 }

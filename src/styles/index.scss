@@ -1,4 +1,9 @@
 // Minimal functional styling for admin interface
+
+// Import theme variables
+@use './theme/variables' as theme;
+
+// Global Reset
 * {
   box-sizing: border-box;
   margin: 0;
@@ -12,8 +17,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   line-height: 1.6;
-  color: #333;
-  background-color: #fff;
+  color: theme.$color-text-primary;
+  background-color: theme.$color-background;
 }
 
 #root {
@@ -24,22 +29,22 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: theme.$spacing-md;
 }
 
 .page-header {
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: theme.$spacing-xl;
+  padding-bottom: theme.$spacing-md;
+  border-bottom: theme.$border-width solid theme.$color-border-light;
 }
 
 .page-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 0.5rem;
+  font-size: theme.$font-size-xxl;
+  font-weight: theme.$font-weight-semibold;
+  margin-bottom: theme.$spacing-xs;
 }
 
 .page-subtitle {
-  color: #666;
-  font-size: 1rem;
+  color: theme.$color-text-secondary;
+  font-size: theme.$font-size-base;
 }

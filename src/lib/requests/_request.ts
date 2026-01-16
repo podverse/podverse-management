@@ -28,6 +28,7 @@ export const request = async <T>(
       url,
       method: 'GET',
       ...requestConfig,
+      withCredentials: true,
       headers: {
         ...(isJSONRequest ? { 'Content-Type': 'application/json' } : {}),
         ...requestConfig?.headers
