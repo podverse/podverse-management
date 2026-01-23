@@ -1,7 +1,7 @@
 export const config = {
   public: {
     brand: {
-      name: process.env.NEXT_PUBLIC_BRAND_NAME || ""
+      name: process.env.NEXT_PUBLIC_BRAND_NAME
     },
     api: {
       client: {
