@@ -19,7 +19,7 @@ Validation occurs in `scripts/validate-env.ts` before the build process. The val
 
 - **`NEXT_PUBLIC_API_PROTOCOL`** (Required) - API protocol (`http` or `https`)
 - **`NEXT_PUBLIC_API_HOST`** (Required) - API hostname
-- **`NEXT_PUBLIC_API_PORT`** (Required) - API port (must be a valid number)
+- **`NEXT_PUBLIC_API_PORT`** (Optional) - API port (must be a valid number if set)
 - **`NEXT_PUBLIC_API_PREFIX`** (Required) - API route prefix (e.g., `/api`)
 - **`NEXT_PUBLIC_API_VERSION`** (Required) - API version (e.g., `v2`)
 
@@ -36,6 +36,12 @@ Validation occurs in `scripts/validate-env.ts` before the build process. The val
 
 ## Optional Variables
 
+### API Configuration
+
+- **`NEXT_PUBLIC_API_PORT`** (Optional) - API port for client-side API requests
+  - Must be a valid positive number if set
+  - If not set, the port will be omitted from the API URL
+
 ### Brand & Features
 
 - **`NEXT_PUBLIC_BRAND_NAME`** (Optional) - Brand name for the application
@@ -44,8 +50,8 @@ Validation occurs in `scripts/validate-env.ts` before the build process. The val
 
 ### Numeric Validation
 
-Variables containing `PORT` are automatically validated to ensure they are valid positive numbers:
-- `NEXT_PUBLIC_API_PORT`
+Variables containing `PORT` are validated to ensure they are valid positive numbers if set:
+- `NEXT_PUBLIC_API_PORT` (Optional - must be a valid number if set)
 
 ### Format Validation
 
